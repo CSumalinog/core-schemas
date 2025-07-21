@@ -9,20 +9,20 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         {/* Header */}
-        <header className="w-full bg-white">
-          <nav className="flex justify-between px-6 py-4">
-            <div className="relative">
+        <header className="w-full bg-white h-20 ">
+          <nav className="flex justify-between items-center h-full px-6">
+            <div className="relative h-[80%]">
               {/* Desktop logo */}
               <img
                 src="/tgp.png"
                 alt="Tgp Logo"
-                className="w-[200px] h-auto hidden md:block"
+                className="h-full hidden md:block"
               />
               {/* Mobile logo */}
               <img
                 src="/tgp.png"
                 alt="Tgp Logo"
-                className="w-[40px] h-auto block md:hidden"
+                className="h-full block md:hidden"
               />
             </div>
           </nav>
