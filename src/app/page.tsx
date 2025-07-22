@@ -3,6 +3,8 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { FcGoogle } from 'react-icons/fc';
+import { LogIn } from 'lucide-react';
 
 export default function Login() {
   const router = useRouter();
@@ -37,7 +39,6 @@ export default function Login() {
     if (error) {
       setErrorMessage('Google sign-in failed');
     }
-    // Redirect happens automatically via Supabase, but you can also set a callback URL.
   };
 
   const handleRoleRedirect = async (userId: string | undefined) => {
@@ -73,61 +74,75 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="min-h-screen flex flex-col md:flex-row bg-neutral-900 ">
+      {/* Left Side (neutral background) */}
+      <div className="hidden md:flex md:w-1/2 items-center justify-center">
+        {/* Optional: branding, logo, or illustration can go here */}
+        <h1 className="text-white text-4xl font-bold">Welcome Back</h1>
+      </div>
 
-        {errorMessage && (
-          <p className="text-red-500 mb-4 text-sm text-center">
-            {errorMessage}
-          </p>
-        )}
+      {/* Right Side (Login form) */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-neutral-800">
+        <div className="w-full max-w-sm backdrop-blur-md rounded-xl shadow-xl p-6 border border-white/20 bg-neutral-100">
+          <h2 className="text-1xl font-bold mb-6 text-center flex items-center justify-center gap-2">
+            <LogIn size={24} /> Login
+          </h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block mb-1 font-medium">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="w-full px-3 py-2 border rounded border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-            />
-          </div>
+          {errorMessage && (
+            <p className="text-red-500 mb-4 text-sm text-center">
+              {errorMessage}
+            </p>
+          )}
 
-          <div className="mb-6">
-            <label htmlFor="password" className="block mb-1 font-medium">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="w-full px-3 py-2 border rounded border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-            />
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="email" className="block mb-1 font-medium">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full px-3 py-2 border rounded border-gray-400 focus:outline-none focus:ring focus:border-gray-500"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="password" className="block mb-1 font-medium">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                className="w-full px-3 py-2 border rounded border-gray-400 focus:outline-none focus:ring focus:border-gray-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-neutral-700 text-white py-2 px-4 rounded hover:bg-amber-200 transition duration-200"
+            >
+              Login
+            </button>
+          </form>
+
+          <div className="flex items-center my-4">
+            <hr className="flex-grow border-t border-gray-400" />
+            <span className="mx-4 text-sm text-neutral-500">OR</span>
+            <hr className="flex-grow border-t border-gray-400" />
           </div>
 
           <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-200"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-2 bg-amber-300 text-white py-2 px-4 rounded hover:bg-neutral-500 transition duration-200"
           >
-            Login
+            <FcGoogle className="w-5 h-5" />
+            Sign in with Google
           </button>
-        </form>
-
-        <div className="my-4 text-center text-sm text-gray-500">OR</div>
-
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition duration-200"
-        >
-          Sign in with Google
-        </button>
-
-      
+        </div>
       </div>
     </div>
   );
