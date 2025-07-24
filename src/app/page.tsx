@@ -80,6 +80,9 @@ export default function Login() {
         {/* Left Side (neutral background) */}
         <div className="hidden md:flex md:w-1/2 items-center justify-center">
           {/* Optional: branding, logo, or illustration can go here */}
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="TGP Logo" className="h-16 w-auto" />
+          </div>
           <h1 className="text-white text-4xl font-bold">Welcome Back</h1>
         </div>
 
