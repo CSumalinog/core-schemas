@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import UserMenu from '@/component/user-menu/page';
+import UserMenu from '@/components/UserMenu';
 import Link from 'next/link';
-import Header from '@/component/header/page';
+import Header from '@/components/Header';
 
 import {
   MdOutlineDashboard,

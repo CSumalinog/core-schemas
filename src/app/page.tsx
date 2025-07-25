@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineLogin } from 'react-icons/md';
-import Footer from '@/component/footer/page';
+import Footer from '@/components/Footer';
 
 export default function Login() {
   const router = useRouter();

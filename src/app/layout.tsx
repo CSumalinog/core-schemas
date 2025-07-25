@@ -1,6 +1,5 @@
 import './globals.css';
-import Header from '@/component/header/page';
-import Footer from '@/component/footer/page';
+import React from 'react';
 
 export default function RootLayout({
   children,

@@ -1,9 +1,10 @@
-import Footer from "@/component/footer/page";
+import AdminCalendar from '@/components/AdminCalendar';
+import Footer from '@/components/Footer';
 
 export default function Calendar() {
   return (
     <>
-      <h1>This is calendar page</h1>
+      <AdminCalendar />
       <Footer />
     </>
   );
