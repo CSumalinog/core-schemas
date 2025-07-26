@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import UserMenu from '@/components/UserMenu';
+import UserMenu from '@/components/adminComponents/UserMenu';
 import Link from 'next/link';
 import Header from '@/components/Header';
 
@@ -104,7 +104,7 @@ export default function AdminLayout({
 
       {/* Main Content */}
       <main
-        className={`flex-1 bg-gray-100 p-4 sm:p-6 mt-4 md:mt-0 transition-all duration-300 ease-in-out ${
+        className={`flex-1 bg-neutral-100 p-4 sm:p-6 mt-4 md:mt-0 transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'opacity-100' : 'opacity-100'
         }`}
         onClick={() => setSidebarOpen(false)} // tap anywhere closes sidebar
