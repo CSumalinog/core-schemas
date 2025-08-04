@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <>
-      <hr className="border-black/20" />
+     
       <footer className="bg-neutral-100 text-neutral-800 text-center py-4 text-sm opacity-80">
         &copy; {new Date().getFullYear()}{' '}
         <img

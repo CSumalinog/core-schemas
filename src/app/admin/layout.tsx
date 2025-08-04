@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import UserMenu from '@/components/adminComponents/UserMenu';
 import Link from 'next/link';
 import Header from '@/components/Header';
-
+import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   MdOutlineDashboard,
   MdOutlineAssignmentTurnedIn,
@@ -12,12 +19,16 @@ import {
 import { LuCalendarDays } from 'react-icons/lu';
 import { FaUsers, FaBars } from 'react-icons/fa';
 import { BiDockLeft, BiDockRight } from 'react-icons/bi';
+import { MdLogout } from 'react-icons/md';
+import { IoSettingsOutline } from 'react-icons/io5';
+import { FaRegCircleUser } from 'react-icons/fa6';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -61,7 +72,7 @@ export default function AdminLayout({
             {collapsed ? <BiDockRight size={25} /> : <BiDockLeft size={25} />}
           </button>
         </div>
-        <hr />
+       
         <div className="flex flex-col h-full mt-4 ">
           {/* Navigation */}
           <nav className="space-y-2 flex-1 ">
@@ -89,7 +100,7 @@ export default function AdminLayout({
             <SidebarLink
               href="/admin/staffer"
               icon={<FaUsers size={22} />}
-              label="Staffer"
+              label="Staffers"
               collapsed={collapsed}
               onClick={() => setSidebarOpen(false)}
             />
@@ -97,7 +108,34 @@ export default function AdminLayout({
 
           {/* User Menu at Bottom */}
           <div className="mt-6 border-t pt-4">
-            <UserMenu collapsed={collapsed} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 hover:bg-neutral-700 rounded px-2 py-2 w-full text-left">
+                  <FaRegCircleUser size={22} />
+                  {!collapsed && <span>Account</span>}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className=" w-58 bg-neutral-800 text-white text-4xl">
+                <DropdownMenuItem
+                  onClick={() => router.push('/admin/settings')}
+                  className="flex items-center gap-2"
+                >
+                  <IoSettingsOutline size={22} className="text-white" />{' '}
+                  Settings
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    // Add actual logout logic here
+                    console.log('Logging out...');
+                    router.push('/login');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <MdLogout size={22} className="text-white" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </aside>

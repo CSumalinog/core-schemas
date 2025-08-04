@@ -1,17 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { useState, useEffect } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -22,15 +12,23 @@ import {
 } from '@/components/ui/table';
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogDescription,
+} from '@/components/ui/alert-dialog';
 import { MoreHorizontal } from 'lucide-react';
-
-import { EventInput } from '@fullcalendar/core';
-import { formatDate } from '@fullcalendar/core';
+import { EventInput, formatDate } from '@fullcalendar/core';
 
 interface EventPreviewPanelProps {
   events: EventInput[];
@@ -46,26 +44,16 @@ export default function EventPreviewPanel({
   const [eventToDelete, setEventToDelete] = useState<EventInput | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
-  const groupedEvents = events.reduce<Record<string, EventInput[]>>(
-    (acc, event) => {
+  const groupedByDate = (filtered: EventInput[]) =>
+    filtered.reduce<Record<string, EventInput[]>>((acc, event) => {
       const date = new Date(event.start as string).toLocaleDateString();
       if (!acc[date]) acc[date] = [];
       acc[date].push(event);
       return acc;
-    },
-    {}
-  );
+    }, {});
 
   const renderTable = (filteredEvents: EventInput[], isTask = false) => {
-    const grouped = filteredEvents.reduce<Record<string, EventInput[]>>(
-      (acc, event) => {
-        const date = new Date(event.start as string).toLocaleDateString();
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(event);
-        return acc;
-      },
-      {}
-    );
+    const grouped = groupedByDate(filteredEvents);
 
     return Object.entries(grouped).map(([date, dateEvents]) => (
       <div
@@ -77,16 +65,11 @@ export default function EventPreviewPanel({
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Description</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Time</TableHead>
-              {isTask && <TableHead>Location</TableHead>}
-              {isTask && <TableHead>Contact Person</TableHead>}
-              {isTask ? (
-                <TableHead>Assigned Staffer</TableHead>
-              ) : (
-                <TableHead>Status</TableHead>
-              )}
+              <TableHead>Location</TableHead>
+              {isTask && <TableHead>Contact</TableHead>}
+              {isTask && <TableHead>Staffer</TableHead>}
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -115,16 +98,7 @@ export default function EventPreviewPanel({
               return (
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">
-                    {event.title.replace(/\s*\([^)]*\)/, '')}
-                  </TableCell>
-                  <TableCell>
-                    {event.description ? (
-                      <span className="italic text-muted-foreground">
-                        {event.description}
-                      </span>
-                    ) : (
-                      '—'
-                    )}
+                    {(event.title ?? '').replace(/\s*\([^)]*\)/, '')}
                   </TableCell>
                   <TableCell>
                     {formatDate(start, {
@@ -134,19 +108,9 @@ export default function EventPreviewPanel({
                     })}
                   </TableCell>
                   <TableCell>{timeRange}</TableCell>
-                  {isTask && <TableCell>{event.location || '—'}</TableCell>}
+                  <TableCell>{event.location || '—'}</TableCell>
                   {isTask && <TableCell>{event.contact || '—'}</TableCell>}
-                  <TableCell>
-                    {event.staffer ? (
-                      <span className="text-sm font-medium text-green-600">
-                        {event.staffer}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        Unassigned
-                      </span>
-                    )}
-                  </TableCell>
+                  {isTask && <TableCell>{event.staffer || '—'}</TableCell>}
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -183,22 +147,27 @@ export default function EventPreviewPanel({
   return (
     <div className="mt-10">
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
         </TabsList>
+
         <TabsContent value="events">
-          <h2 className="text-xl font-semibold mb-4">Scheduled Events</h2>
-          {Object.keys(groupedEvents).length === 0 ? (
+          
+          {events.filter((e) => !e.task).length === 0 ? (
             <div className="italic text-center text-gray-400">
               No events scheduled
             </div>
           ) : (
-            renderTable(events.filter((e) => !e.task))
+            renderTable(
+              events.filter((e) => !e.task),
+              false
+            )
           )}
         </TabsContent>
+
         <TabsContent value="tasks">
-          <h2 className="text-xl font-semibold mb-4">Assigned Tasks</h2>
+         
           {events.filter((e) => e.task).length === 0 ? (
             <div className="italic text-center text-gray-400">
               No tasks assigned

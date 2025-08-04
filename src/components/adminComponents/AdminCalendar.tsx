@@ -1,18 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  formatDate,
-  DateSelectArg,
-  EventClickArg,
-  EventInput,
-} from '@fullcalendar/core';
+import { DateSelectArg, EventInput } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+
 import EventDialogue from './AdminCalendarDialog';
-import EventPreviewPanel from './EventPreviewPanel';
+import PreviewPanel from './PreviewPanel';
 
 const Calendar = () => {
   const [currentEvents, setCurrentEvents] = useState<EventInput[]>([]);
@@ -21,6 +17,7 @@ const Calendar = () => {
   const calendarRef = useRef<FullCalendar>(null);
   const [editEvent, setEditEvent] = useState<EventInput | null>(null);
 
+  // Load saved events from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedEvents = localStorage.getItem('events');
@@ -30,6 +27,7 @@ const Calendar = () => {
     }
   }, []);
 
+  // Persist to localStorage on change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('events', JSON.stringify(currentEvents));
@@ -38,14 +36,58 @@ const Calendar = () => {
 
   const handleDateClick = (selectInfo: DateSelectArg) => {
     setSelectedDate(selectInfo);
+    setEditEvent(null); // Reset edit mode
     setIsDialogOpen(true);
+  };
+
+  const handleEventDrop = (info: any) => {
+    const updatedEvents = currentEvents.map((event) =>
+      event.id === info.event.id
+        ? {
+            ...event,
+            start: info.event.startStr,
+            end: info.event.endStr,
+          }
+        : event
+    );
+    setCurrentEvents(updatedEvents);
+  };
+
+  const handleEventResize = (info: any) => {
+    const updatedEvents = currentEvents.map((event) =>
+      event.id === info.event.id
+        ? {
+            ...event,
+            start: info.event.startStr,
+            end: info.event.endStr,
+          }
+        : event
+    );
+    setCurrentEvents(updatedEvents);
+  };
+
+  const getEventClassNames = (arg: any) => {
+    const isTask = arg.event.extendedProps.task;
+    return isTask ? 'task-event' : 'calendar-event';
   };
 
   return (
     <>
+      <style jsx global>{`
+        .task-event {
+          background-color: #facc15 !important;
+          color: #000 !important;
+        }
+        .calendar-event {
+          background-color: #3b82f6 !important;
+          color: #fff !important;
+        }
+      `}</style>
+
       <div className="px-4 md:px-10 py-6 space-y-8">
         <FullCalendar
           key={currentEvents.length}
+          ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{
             left: 'prev,next today',
@@ -59,32 +101,31 @@ const Calendar = () => {
           dayMaxEvents={true}
           select={handleDateClick}
           events={currentEvents}
+          eventDrop={handleEventDrop}
+          eventResize={handleEventResize}
+          eventResizableFromStart={true}
+          eventClassNames={getEventClassNames}
         />
 
-        <div>
-          <EventPreviewPanel
-            events={currentEvents}
-            onDelete={(id) =>
-              setCurrentEvents((prev) =>
-                prev.filter((event) => event.id !== id)
-              )
-            }
-            onEdit={(event) => {
-              // Your edit logic here, e.g., open dialog and populate form
-              setSelectedDate({
-                startStr: event.start as string,
-                endStr: event.end as string,
-                allDay: event.allDay ?? false,
-                start: new Date(event.start as string),
-                end: new Date(event.end as string),
-                view: calendarRef.current?.getApi().view!, // if using ref
-                jsEvent: null, // Added to satisfy DateSelectArg type
-              });
-              setEditEvent(event);
-              setIsDialogOpen(true);
-            }}
-          />
-        </div>
+        <PreviewPanel
+          events={currentEvents}
+          onDelete={(id) =>
+            setCurrentEvents((prev) => prev.filter((event) => event.id !== id))
+          }
+          onEdit={(event) => {
+            setSelectedDate({
+              startStr: event.start as string,
+              endStr: event.end as string,
+              allDay: event.allDay ?? false,
+              start: new Date(event.start as string),
+              end: new Date(event.end as string),
+              view: calendarRef.current?.getApi().view!,
+              jsEvent: {} as any,
+            });
+            setEditEvent(event);
+            setIsDialogOpen(true);
+          }}
+        />
       </div>
 
       <EventDialogue
@@ -93,15 +134,48 @@ const Calendar = () => {
         selectedDate={selectedDate}
         onAddEvent={(data) => {
           if (!selectedDate) return;
-          const newEvent = {
-            id: `${selectedDate.startStr}-${data.title}`,
-            title: data.title,
+
+          const isEditing = !!editEvent;
+          const eventId = isEditing
+            ? editEvent!.id
+            : `${selectedDate.startStr}-${data.title}`;
+
+          const newEvent: EventInput = {
+            id: eventId,
             start: selectedDate.startStr,
-            end: selectedDate.endStr,
+            end: selectedDate.endStr || selectedDate.startStr,
             allDay: selectedDate.allDay,
             ...data,
           };
-          setCurrentEvents((prev) => [...prev, newEvent]);
+
+          setCurrentEvents((prev) =>
+            isEditing
+              ? prev.map((event) => (event.id === eventId ? newEvent : event))
+              : [...prev, newEvent]
+          );
+        }}
+        onAddTask={(task) => {
+          if (!selectedDate) return;
+
+          const isEditing = !!editEvent;
+          const taskId = isEditing
+            ? editEvent!.id
+            : `${selectedDate.startStr}-${task.title}`;
+
+          const newTask: EventInput = {
+            id: taskId,
+            start: selectedDate.startStr,
+            end: selectedDate.endStr || selectedDate.startStr,
+            allDay: selectedDate.allDay,
+            task: true,
+            ...task,
+          };
+
+          setCurrentEvents((prev) =>
+            isEditing
+              ? prev.map((event) => (event.id === taskId ? newTask : event))
+              : [...prev, newTask]
+          );
         }}
       />
     </>

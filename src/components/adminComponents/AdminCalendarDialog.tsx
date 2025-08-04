@@ -10,26 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { DateSelectArg } from '@fullcalendar/core';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
 interface EventDialogueProps {
   isDialogOpen: boolean;
@@ -37,7 +17,7 @@ interface EventDialogueProps {
   selectedDate: DateSelectArg | null;
   isAdmin?: boolean;
   onAddEvent: (data: any) => void;
-  onAddTask?: (task: any) => void; // optional handler for tasks
+  onAddTask?: (task: any) => void;
 }
 
 export default function EventDialogue({
@@ -50,7 +30,6 @@ export default function EventDialogue({
 }: EventDialogueProps) {
   const [activeTab, setActiveTab] = useState<'event' | 'task'>('event');
 
-  // Separate form states for event and task
   const [eventData, setEventData] = useState({
     title: '',
     startTime: '',
@@ -90,26 +69,37 @@ export default function EventDialogue({
 
   const handleEventSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     const titleWithTime = `${eventData.title} (${eventData.startTime} - ${eventData.endTime})`;
+
     onAddEvent({
       ...eventData,
       title: titleWithTime,
+      start: selectedDate?.startStr,
+      end: selectedDate?.endStr || selectedDate?.startStr,
+      allDay: selectedDate?.allDay,
     });
+
     resetForms();
     setIsDialogOpen(false);
   };
 
   const handleTaskSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     const taskWithTime = {
       ...taskData,
+      task: true,
       title: `${taskData.title} (${taskData.startTime} - ${taskData.endTime})`,
+      start: selectedDate?.startStr,
+      end: selectedDate?.endStr || selectedDate?.startStr,
+      allDay: selectedDate?.allDay,
     };
 
     if (onAddTask) {
-      onAddTask(taskWithTime); // pass to parent if handler is provided
+      onAddTask(taskWithTime);
     } else {
-      console.log('Task created:', taskWithTime); // fallback
+      console.warn('Task handler not provided:', taskWithTime);
     }
 
     resetForms();
@@ -197,7 +187,7 @@ export default function EventDialogue({
                 type="submit"
                 className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
               >
-                Save 
+                Save
               </button>
             </form>
           </TabsContent>
