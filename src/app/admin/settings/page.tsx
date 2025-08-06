@@ -9,7 +9,7 @@ export default function SettingsPage() {
           This is the settings page for the admin section.
         </p>
       </div>
-      <Footer />
+      
     </>
   );
 }

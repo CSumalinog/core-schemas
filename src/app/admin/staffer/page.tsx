@@ -1,5 +1,4 @@
 import StafferTabs from '@/components/adminComponents/StafferTabs';
-import Footer from '@/components/Footer';
 import { mockStaffers } from '@/mock/staffers';
 
 export default function Staffer() {
@@ -15,7 +14,7 @@ export default function Staffer() {
             | 'managerial',
         }))}
       />
-      <Footer />
+      
     </>
   );
 }

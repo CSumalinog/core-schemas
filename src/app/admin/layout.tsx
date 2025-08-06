@@ -8,18 +8,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   MdOutlineDashboard,
   MdOutlineAssignmentTurnedIn,
+  MdLogout,
 } from 'react-icons/md';
 import { LuCalendarDays } from 'react-icons/lu';
 import { FaUsers, FaBars } from 'react-icons/fa';
 import { BiDockLeft, BiDockRight } from 'react-icons/bi';
-import { MdLogout } from 'react-icons/md';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { FaRegCircleUser } from 'react-icons/fa6';
 
@@ -41,26 +39,16 @@ export default function AdminLayout({
         </button>
       </header>
 
-      {/* Sidebar Drawer */}
+      {/* Sidebar */}
       <aside
-        className={`
-          fixed z-50 inset-y-0 left-0 bg-neutral-900 text-white p-4
-          transform transition-transform duration-300 ease-in-out
+        className={`fixed z-50 inset-y-0 left-0 bg-neutral-900 text-white p-4 transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:static md:translate-x-0 
           ${collapsed ? 'w-20' : 'w-64'} 
-          flex flex-col justify-between
-        `}
+          flex flex-col justify-between`}
         style={{ backdropFilter: 'blur(4px)' }}
       >
-        {/* Mobile Close Button (Hidden) */}
-        <div className="flex justify-end mb-4 ">
-          {/* <button onClick={() => setSidebarOpen(false)}>
-            <FaTimes size={22} />
-          </button> */}
-        </div>
-
-        {/* Logo + Collapse Toggle (Desktop only) */}
+        {/* Logo + Collapse Toggle */}
         <div className="flex items-center justify-between mb-6 px-2">
           <div className="mt-2">
             <Header />
@@ -72,80 +60,75 @@ export default function AdminLayout({
             {collapsed ? <BiDockRight size={25} /> : <BiDockLeft size={25} />}
           </button>
         </div>
-       
-        <div className="flex flex-col h-full mt-4 ">
-          {/* Navigation */}
-          <nav className="space-y-2 flex-1 ">
-            <SidebarLink
-              href="/admin/dashboard"
-              icon={<MdOutlineDashboard size={22} />}
-              label="Dashboard"
-              collapsed={collapsed}
-              onClick={() => setSidebarOpen(false)}
-            />
-            <SidebarLink
-              href="/admin/calendar"
-              icon={<LuCalendarDays size={22} />}
-              label="Calendar"
-              collapsed={collapsed}
-              onClick={() => setSidebarOpen(false)}
-            />
-            <SidebarLink
-              href="/admin/assignment"
-              icon={<MdOutlineAssignmentTurnedIn size={22} />}
-              label="Assignment"
-              collapsed={collapsed}
-              onClick={() => setSidebarOpen(false)}
-            />
-            <SidebarLink
-              href="/admin/staffer"
-              icon={<FaUsers size={22} />}
-              label="Staffers"
-              collapsed={collapsed}
-              onClick={() => setSidebarOpen(false)}
-            />
-          </nav>
 
-          {/* User Menu at Bottom */}
-          <div className="mt-6 border-t pt-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 hover:bg-neutral-700 rounded px-2 py-2 w-full text-left">
-                  <FaRegCircleUser size={22} />
-                  {!collapsed && <span>Account</span>}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className=" w-58 bg-neutral-800 text-white text-4xl">
-                <DropdownMenuItem
-                  onClick={() => router.push('/admin/settings')}
-                  className="flex items-center gap-2"
-                >
-                  <IoSettingsOutline size={22} className="text-white" />{' '}
-                  Settings
-                </DropdownMenuItem>
+        {/* Navigation */}
+        <nav className="space-y-2 flex-1">
+          <SidebarLink
+            href="/admin/dashboard"
+            icon={<MdOutlineDashboard size={22} />}
+            label="Dashboard"
+            collapsed={collapsed}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <SidebarLink
+            href="/admin/calendar"
+            icon={<LuCalendarDays size={22} />}
+            label="Calendar"
+            collapsed={collapsed}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <SidebarLink
+            href="/admin/assignment"
+            icon={<MdOutlineAssignmentTurnedIn size={22} />}
+            label="Assignment"
+            collapsed={collapsed}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <SidebarLink
+            href="/admin/staffer"
+            icon={<FaUsers size={22} />}
+            label="Staffers"
+            collapsed={collapsed}
+            onClick={() => setSidebarOpen(false)}
+          />
+        </nav>
 
-                <DropdownMenuItem
-                  onClick={() => {
-                    // Add actual logout logic here
-                    console.log('Logging out...');
-                    router.push('/login');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <MdLogout size={22} className="text-white" /> Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        {/* Account Menu */}
+        <div className="mt-6 border-t pt-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 hover:bg-neutral-700 rounded px-2 py-2 w-full text-left">
+                <FaRegCircleUser size={22} />
+                {!collapsed && <span>Account</span>}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-58 bg-neutral-800 text-white">
+              <DropdownMenuItem
+                onClick={() => router.push('/admin/settings')}
+                className="flex items-center gap-2"
+              >
+                <IoSettingsOutline size={22} className="text-white" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  console.log('Logging out...');
+                  router.push('/login');
+                }}
+                className="flex items-center gap-2"
+              >
+                <MdLogout size={22} className="text-white" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
       {/* Main Content */}
       <main
-        className={`flex-1 bg-neutral-100 p-4 sm:p-6 mt-4 md:mt-0 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? 'opacity-100' : 'opacity-100'
-        }`}
-        onClick={() => setSidebarOpen(false)} // tap anywhere closes sidebar
+        className="flex-1 bg-neutral-100 p-4 sm:p-6 mt-4 md:mt-0 transition-all duration-300 ease-in-out"
+        onClick={() => setSidebarOpen(false)}
       >
         {children}
       </main>
@@ -170,7 +153,7 @@ function SidebarLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-2 hover:bg-neutral-700 rounded px-2 py-2"
+      className="flex items-center gap-3 hover:bg-neutral-700 rounded px-3 py-3"
     >
       {icon}
       {!collapsed && <span>{label}</span>}
