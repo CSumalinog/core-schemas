@@ -5,7 +5,7 @@ export default function Calendar() {
   return (
     <>
       <AdminCalendar />
-      <Footer />
+      
     </>
   );
 }

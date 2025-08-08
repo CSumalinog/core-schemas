@@ -1,13 +1,28 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Image from 'next/image';
+import React from 'react';
 
-type Staffer = {
+export type RoleType =
+  | 'editor_in_chief'
+  | 'technical_editor'
+  | 'creative_director'
+  | 'managing_editor'
+  | 'associate'
+  | 'director'
+  | 'head'
+  | 'member'
+  | 'other';
+
+export type Staffer = {
   id: string;
   name: string;
   role: string;
   group: 'scribes' | 'creatives' | 'managerial' | 'executives';
-  image?: string; // For image support
+  roleType: RoleType;
+  section?: string; // Section name for heads and their members (e.g., "Section A")
+  image?: string;
 };
 
 type StafferTabsProps = {
@@ -20,6 +35,19 @@ const categories = [
   { key: 'creatives', label: 'Creatives' },
   { key: 'managerial', label: 'Managerial' },
 ];
+
+// define which section names to render per group
+const sectionsPerGroup: Record<string, string[]> = {
+  scribes: [
+    'Section A',
+    'Section B',
+    'Section C',
+    'Section D',
+    'Section E',
+    'Section F',
+  ],
+  creatives: ['Section A', 'Section B', 'Section C', 'Section D'],
+};
 
 export default function StafferTabs({ staffers }: StafferTabsProps) {
   return (
@@ -38,28 +66,135 @@ export default function StafferTabs({ staffers }: StafferTabsProps) {
         </TabsList>
 
         {categories.map((cat) => (
-          <TabsContent key={cat.key} value={cat.key}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-              {staffers
-                .filter((s) => s.group === cat.key)
-                .map((staffer) => (
-                  <div
-                    key={staffer.id}
-                    className="bg-white p-4 rounded-md shadow hover:shadow-md transition"
-                  >
-                    {/* 👉 Add image here if available */}
-                    {staffer.image && (
-                      <img
-                        src={staffer.image}
-                        alt={staffer.name}
-                        className="w-full h-48 object-cover rounded-md mb-4"
-                      />
-                    )}
-                    <h3 className="text-md ">{staffer.name}</h3>
-                    <p className="text-gray-600">{staffer.role}</p>
-                  </div>
-                ))}
-            </div>
+          <TabsContent key={cat.key} value={cat.key} className="mt-6">
+            {/* If this group has defined sections, render sectioned table */}
+            {sectionsPerGroup[cat.key] ? (
+              <table className="min-w-full bg-white shadow-sm rounded-md table-auto">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Photo
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Role
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {sectionsPerGroup[cat.key].map((sectionName) => {
+                    const membersInSection = staffers.filter(
+                      (s) =>
+                        s.group === (cat.key as Staffer['group']) &&
+                        (s.section || '') === sectionName
+                    );
+
+                    return (
+                      <React.Fragment key={sectionName}>
+                        {/* Section header row spanning all columns */}
+                        <tr>
+                          <td
+                            colSpan={3}
+                            className="px-6 py-2 bg-gray-100 text-sm font-medium text-gray-800"
+                          >
+                            {sectionName}
+                          </td>
+                        </tr>
+
+                        {/* If there are members, show them; else show a few empty placeholder rows to match look */}
+                        {membersInSection.length > 0
+                          ? membersInSection.map((staffer) => (
+                              <tr key={staffer.id} className="border-t">
+                                <td className="px-6 py-4">
+                                  {staffer.image ? (
+                                    <div className="w-12 h-12 relative rounded-full overflow-hidden">
+                                      <Image
+                                        src={staffer.image}
+                                        alt={staffer.name}
+                                        fill
+                                        style={{ objectFit: 'cover' }}
+                                        sizes="48px"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                      N/A
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                  {staffer.name}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-700">
+                                  {staffer.role}
+                                </td>
+                              </tr>
+                            ))
+                          : // render 3 empty rows for visual spacing (like your screenshot)
+                            Array.from({ length: 3 }).map((_, i) => (
+                              <tr key={i} className="border-t">
+                                <td className="px-6 py-8" />
+                                <td className="px-6 py-8" />
+                                <td className="px-6 py-8" />
+                              </tr>
+                            ))}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              /* Fallback: regular flat table for groups without sectioning */
+              <table className="min-w-full bg-white shadow-sm rounded-md table-auto">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Photo
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      Role
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {staffers
+                    .filter((s) => s.group === (cat.key as Staffer['group']))
+                    .map((staffer) => (
+                      <tr key={staffer.id} className="border-t">
+                        <td className="px-6 py-4">
+                          {staffer.image ? (
+                            <div className="w-12 h-12 relative rounded-full overflow-hidden">
+                              <Image
+                                src={staffer.image}
+                                alt={staffer.name}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                sizes="48px"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                              N/A
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          {staffer.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {staffer.role}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            )}
           </TabsContent>
         ))}
       </Tabs>
