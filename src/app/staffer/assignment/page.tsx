@@ -78,21 +78,21 @@ export default function AdminLayout({
           <nav className="space-y-2 flex-1 ">
             
             <SidebarLink
-              href="/admin/calendar"
+              href="/staffer/calendar"
               icon={<LuCalendarDays size={22} />}
               label="Calendar"
               collapsed={collapsed}
               onClick={() => setSidebarOpen(false)}
             />
             <SidebarLink
-              href="/admin/assignment"
+              href="/staffer/assignment"
               icon={<MdOutlineAssignmentTurnedIn size={22} />}
               label="Assignment"
               collapsed={collapsed}
               onClick={() => setSidebarOpen(false)}
             />
             <SidebarLink
-              href="/admin/staffer"
+              href="/staffer/staffer"
               icon={<FaUsers size={22} />}
               label="Staffers"
               collapsed={collapsed}

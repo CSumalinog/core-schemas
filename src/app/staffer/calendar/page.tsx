@@ -1,6 +1,11 @@
-export default function stafferCalendar() {
+import AdminCalendar from '@/components/adminComponents/AdminCalendar';
+import Footer from '@/components/Footer';
+
+export default function Calendar() {
   return (
-    <h1>This is staffer's calendar page</h1>
-    
+    <>
+      <AdminCalendar />
+      <Footer />
+    </>
   );
 }
